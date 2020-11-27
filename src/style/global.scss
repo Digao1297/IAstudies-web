@@ -1,0 +1,15 @@
+body,
+html {
+  height: 100%;
+  width: 100%;
+}
+
+.center-x-y {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+.center-x {
+  display: flex !important;
+  justify-content: center !important;
+}
