@@ -1,2 +1,2 @@
-export const getMatrix = (state) => state.user;
+export const getResult = (state) => state.result;
 // Form

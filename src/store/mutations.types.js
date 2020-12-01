@@ -1,1 +1,1 @@
-export const SET_MATRIX = "MATRIX/SET_MATRIX";
+export const SET_RESULT = "MATRIX/SET_RESULT";
