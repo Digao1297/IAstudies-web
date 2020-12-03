@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    {{ pos }}
     <div class="row center-x-y">
       <div class="col col-sm-5 col-md-5 col-lg-4 col-xl-4 ">
         <div class="options">
@@ -48,7 +49,7 @@ export default {
   data: () => ({
     algorithms: [
       { id: 0, name: "Greedy Search" },
-      { id: 1, name: "Search A Star" }
+      { id: 1, name: "Search A Star" },
     ],
     selected: "",
     pos: { x: 0, y: 0 },
@@ -80,35 +81,35 @@ export default {
     //   "5:4",
     //   "5:3",
     // ],
-    // result: [
-    //   "12:4",
-    //   "11:4",
-    //   "11:3",
-    //   "11:2",
-    //   "11:1",
-    //   "10:1",
-    //   "9:1",
-    //   "8:1",
-    //   "7:1",
-    //   "7:2",
-    // ],
-
     result: [
-      "12:0",
-      "11:0",
-      "11:1",
-      "11:2",
-      "11:3",
+      "12:4",
       "11:4",
-      "11:5",
-      "11:6",
-      "11:7",
-      "11:8",
-      "11:9",
-      "11:10",
-      "10:10",
-      "10:9"
+      "11:3",
+      "11:2",
+      "11:1",
+      "10:1",
+      "9:1",
+      "8:1",
+      "7:1",
+      "7:2",
     ],
+
+    // result: [
+    //   "12:0",
+    //   "11:0",
+    //   "11:1",
+    //   "11:2",
+    //   "11:3",
+    //   "11:4",
+    //   "11:5",
+    //   "11:6",
+    //   "11:7",
+    //   "11:8",
+    //   "11:9",
+    //   "11:10",
+    //   "10:10",
+    //   "10:9",
+    // ],
     // result: ["1:14", "1:13", "2:13", "2:14"],
     matrix: [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -123,14 +124,14 @@ export default {
       [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
       [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-      [3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+      [3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
     ],
     positionStop: {
       "11:1": true,
       "11:4": true,
       "11:7": true,
       "11:10": true,
-      "11:13": true
+      "11:13": true,
     },
     shelfSide: {
       "0": true,
@@ -142,17 +143,17 @@ export default {
       "5": false,
       "8": false,
       "11": false,
-      "14": false
-    }
+      "14": false,
+    },
   }),
   computed: {
     ...mapGetters({
-      getResult: "getResult"
-    })
+      getResult: "getResult",
+    }),
   },
   methods: {
     ...mapActions({
-      actionSendRequest: "actionSendRequest"
+      actionSendRequest: "actionSendRequest",
     }),
 
     createStock() {
@@ -187,6 +188,7 @@ export default {
         }
       }
     },
+
     createField(x, y, width, height, type) {
       const field = document.createElement("div");
       for (let i = 0; i < type.length; i++) {
@@ -204,6 +206,7 @@ export default {
         } else if (type[i] == "shelf") {
           field.addEventListener("click", () => {
             this.setPosition(x, y);
+            this.selectShelf(x, y);
           });
           field.style = "cursor:pointer;";
           field.classList.add(type[i]);
@@ -218,29 +221,41 @@ export default {
 
       return field;
     },
+
     async start(r) {
       const robot = document.getElementById(r);
 
-      if (
-        this.result[this.result.length - 1] == `${this.pos.x}:${this.pos.y}`
-      ) {
+      if (this.robots[r] == `${this.pos.x}:${this.pos.y}`) {
         await this.deliveryPackge(robot);
-      } else if (
-        this.result[this.result.length - 1] != `${this.pos.x}:${this.pos.y}`
-      ) {
+      } else if (this.robots[r] != `${this.pos.x}:${this.pos.y}`) {
         await this.moveRobot(robot);
       }
     },
+
     setElement(robot, position) {
       let el = document.getElementById(`${position}`);
       el.appendChild(robot);
     },
+
     setPosition(x, y) {
       this.pos.x = x;
       this.pos.y = y;
     },
+
     sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    },
+
+    selectShelf(x, y) {
+      let shelves = document.getElementsByClassName("shelf");
+      let shelf = document.getElementById(`${x}:${y}`);
+
+      shelves.forEach((element) => {
+        element.style.backgroundImage =
+          "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAIGNIUk0AAHolAACAgwAA+f8AAIDpAAB1MAAA6mAAADqYAAAXb5JfxUYAAACFSURBVHja7Nq9DUBgFIbRzyIGkG8IiVlEaQKVCZRiFonGBqIxDAvQqPycp7zdqd+bpDHu4aSxX8ITK6p4ek+uIE1dPxLSdh0ICMgdyDaHfVqH8ObyrAQBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH5KMTODgLyc8jbHs8OAAAA//8DAG1BC1iDn1x5AAAAAElFTkSuQmCC')";
+      });
+      shelf.style.backgroundImage =
+        "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAIAAACRXR/mAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpGRUMxQUZEREJCMzVFQjExODZERUVGOTZEMUEyMjM2NCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDo1QTVEMkEzQzM1QkMxMUVCQjk1Q0ZEODM0MkRFMjE1OSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDo1QTVEMkEzQjM1QkMxMUVCQjk1Q0ZEODM0MkRFMjE1OSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M2IChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZFQzFBRkREQkIzNUVCMTE4NkRFRUY5NkQxQTIyMzY0IiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOkZFQzFBRkREQkIzNUVCMTE4NkRFRUY5NkQxQTIyMzY0Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+CyhpcgAAAKFJREFUeNpilNPRYUAFe2deYaAvcE5HdwMLpqID12Yz0BtMROMzMQxKMOqsYeAsxttHBySN4wMOWqmjkTjqrFFnjTpr1FlUASzEKIpcQeVqYHlE6mgkjjpr1Fmjzhp11qizRp016qxRZw36ZiDBVttoJI46a9RZo84addaos0gAjJhzPrX5+XR2RPPE0cmVUWcNYHvLQYveratmBvRsBxBgAEd0FJrtUeDMAAAAAElFTkSuQmCC')";
     },
     /**
      * metodo responsavel por mover o robo seguindo o vetor com a rota.
@@ -266,7 +281,7 @@ export default {
         colRobot = 0,
         side = 0,
         nameRobot = "",
-        positionRobot;
+        positionRobot = [];
       /**
        * for responsavel por fazer o robo descer a coluna ate a linha para a entrega
        * a cada alteração da posição do robo é adicionado na @goBack para gerar a rota de volta.
@@ -331,28 +346,28 @@ export default {
 
       let request = {
         destiny: this.pos,
-        robots: this.robots
+        robots: this.robots,
       };
 
       if (this.selected.id == 0)
         this.actionSendRequest({
           url: greedy_search,
-          request
+          request,
         }).then(() => {
           this.start("r0");
         });
       else if (this.selected.id == 1)
         this.actionSendRequest({
           url: a_star,
-          request
+          request,
         }).then(() => {
           this.start("r0");
         });
-    }
+    },
   },
   mounted() {
     this.createStock();
-  }
+  },
 };
 </script>
 
@@ -387,6 +402,7 @@ export default {
   background-color: rgb(75, 75, 75);
 }
 .shelf {
+  background-color: #9b9b9b;
   background-image: url("../assets/shelf.png");
   background-repeat: no-repeat;
   background-size: contain;
