@@ -13,6 +13,7 @@
               class="form-control btn-group"
               v-model="selected"
             >
+              <option value="" selected disabled hidden>Select Option</option>
               <option
                 v-for="(algorithm, item) in algorithms"
                 :key="item"
