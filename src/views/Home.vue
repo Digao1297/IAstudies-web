@@ -1,23 +1,31 @@
 <template>
-  <div class="home center-x-y">
-    <div class="container-home">
-      <div class="matriz">
-        {{ pos }}
-
+  <div class="home">
+    <div class="row center-x-y">
+      <div class="col col-sm-5 col-md-5 col-lg-4 col-xl-4 ">
+        <div class="options">
+          <div class="form-group ">
+            <label for="inputOption"
+              ><span style="font-size:30px;">&#128187;</span> Algorithms</label
+            >
+            <select id="inputOption" class="form-control">
+              <option>Greedy Search</option>
+              <option>Search A&#9733;</option>
+            </select>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-start btn btn-lg btn-success"
+          :disabled="inMove"
+          @click.prevent="callApi"
+        >
+          Start
+        </button>
+      </div>
+      <div class="center-x col col-sm-12 col-md-12 col-lg-8 col-xl-8 ">
         <div class="stock" ref="stock"></div>
       </div>
-      <button :disabled="inMove" @click.prevent="callApi">move</button>
-      <div class="options center-x">
-        <div class="form-group col-5">
-          <label for="inputOption">Options</label>
-          <select id="inputOption" class="form-control">
-            <option selected> </option>
-            <option>Busca gulosa</option>
-          </select>
-        </div>
-      </div>
     </div>
-    {{ getResult }}
   </div>
 </template>
 
@@ -31,33 +39,32 @@ export default {
     pos: { x: 0, y: 0 },
     robots: {},
     inMove: false,
+    speed: 350,
     /**
      * shelf : 0
      * hall : 1
      * dead zone : 2
      * robots : 3
      * delivery : 4
-     *
-     *
      */
-    result: [
-      "5:2",
-      "5:1",
-      "4:1",
-      "3:1",
-      "2:1",
-      "1:1",
-      "0:1",
-      "0:2",
-      "0:3",
-      "0:4",
-      "1:4",
-      "2:4",
-      "3:4",
-      "4:4",
-      "5:4",
-      "5:3",
-    ],
+    // result: [
+    //   "5:2",
+    //   "5:1",
+    //   "4:1",
+    //   "3:1",
+    //   "2:1",
+    //   "1:1",
+    //   "0:1",
+    //   "0:2",
+    //   "0:3",
+    //   "0:4",
+    //   "1:4",
+    //   "2:4",
+    //   "3:4",
+    //   "4:4",
+    //   "5:4",
+    //   "5:3",
+    // ],
     // result: [
     //   "12:4",
     //   "11:4",
@@ -71,22 +78,22 @@ export default {
     //   "7:2",
     // ],
 
-    // result: [
-    //   "12:0",
-    //   "11:0",
-    //   "11:1",
-    //   "11:2",
-    //   "11:3",
-    //   "11:4",
-    //   "11:5",
-    //   "11:6",
-    //   "11:7",
-    //   "11:8",
-    //   "11:9",
-    //   "11:10",
-    //   "10:10",
-    //   "10:9",
-    // ],
+    result: [
+      "12:0",
+      "11:0",
+      "11:1",
+      "11:2",
+      "11:3",
+      "11:4",
+      "11:5",
+      "11:6",
+      "11:7",
+      "11:8",
+      "11:9",
+      "11:10",
+      "10:10",
+      "10:9",
+    ],
     // result: ["1:14", "1:13", "2:13", "2:14"],
     matrix: [
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -135,27 +142,31 @@ export default {
 
     createStock() {
       const stock = this.$refs.stock;
-
+      let size = 4;
       for (let i = 0; i < this.matrix.length; i++) {
         for (let j = 0; j < this.matrix[0].length; j++) {
           switch (this.matrix[i][j]) {
             case 0:
-              stock.appendChild(this.createField(i, j, 50, 50, ["shelf"]));
+              stock.appendChild(this.createField(i, j, size, size, ["shelf"]));
               break;
             case 1:
-              stock.appendChild(this.createField(i, j, 50, 50, ["hall"]));
+              stock.appendChild(this.createField(i, j, size, size, ["hall"]));
               break;
             case 3:
               stock.appendChild(
-                this.createField(i, j, 50, 50, ["garage", "robot"])
+                this.createField(i, j, size, size, ["garage", "robot"])
               );
               break;
             case 4:
-              stock.appendChild(this.createField(i, j, 50, 50, ["delivery"]));
+              stock.appendChild(
+                this.createField(i, j, size, size, ["delivery"])
+              );
               break;
 
             default:
-              stock.appendChild(this.createField(i, j, 50, 50, ["dead-zone"]));
+              stock.appendChild(
+                this.createField(i, j, size, size, ["dead-zone"])
+              );
               break;
           }
         }
@@ -163,7 +174,6 @@ export default {
     },
     createField(x, y, width, height, type) {
       const field = document.createElement("div");
-
       for (let i = 0; i < type.length; i++) {
         if (type[i] == "robot") {
           const robot = document.createElement("div");
@@ -172,8 +182,6 @@ export default {
 
           robot.classList.add("robot");
           robot.setAttribute("id", name);
-          robot.style.width = width - 10 + "px";
-          robot.style.height = height - 10 + "px";
 
           field.appendChild(robot);
 
@@ -184,16 +192,14 @@ export default {
           });
           field.style = "cursor:pointer;";
           field.classList.add(type[i]);
-          field.classList.add("center-x-y");
         } else {
           field.classList.add(type[i]);
-          field.classList.add("center-x-y");
         }
+        field.classList.add("center-x-y");
+        field.classList.add("square");
       }
 
       field.setAttribute("id", `${x}:${y}`);
-      field.style.width = width + "px";
-      field.style.height = height + "px";
 
       return field;
     },
@@ -210,9 +216,8 @@ export default {
         await this.moveRobot(robot);
       }
     },
-    setElement(robot, position, color = "#ff0000") {
+    setElement(robot, position) {
       let el = document.getElementById(`${position}`);
-      el.style.backgroundColor = color;
       el.appendChild(robot);
     },
     setPosition(x, y) {
@@ -230,8 +235,10 @@ export default {
       for (let i = 0; i < this.result.length; i++) {
         this.setElement(robot, this.result[i]);
         // console.log(`move ${this.result[i]}`);
-        await this.sleep(200);
+        await this.sleep(this.speed);
       }
+      await this.sleep(1000);
+
       this.deliveryPackge(robot);
     },
 
@@ -268,7 +275,7 @@ export default {
         // console.log(`delivery A ${i}:${side}`);
 
         goBack.push(`${i}:${side}`);
-        await this.sleep(100);
+        await this.sleep(this.speed);
       }
 
       /**
@@ -281,8 +288,10 @@ export default {
         // console.log(`delivery B 11:${j}`);
 
         goBack.push(`11:${j}`);
-        await this.sleep(100);
+        await this.sleep(this.speed);
       }
+      await this.sleep(1000);
+
       /**
        * for responsavel por percorrer a @goBack para retornar o robo a posição da pratilheira.
        */
@@ -292,7 +301,7 @@ export default {
         // console.log(`go back ${goBack[i]}`);
 
         goBack.push(goBack[i]);
-        await this.sleep(100);
+        await this.sleep(this.speed);
       }
       nameRobot = robot.getAttribute("id");
       positionRobot = goBack[0].split(":");
@@ -301,6 +310,10 @@ export default {
     },
 
     callApi() {
+      // http://localhost:8000/api/v1/algorithms/a_star
+
+      // http://localhost:8000/api/v1/algorithms/greedy_search
+
       let request = {
         destiny: this.pos,
         robots: this.robots,
@@ -310,7 +323,7 @@ export default {
         url: "http://localhost:8000/api/v1/algorithms/a_star",
         request,
       }).then(() => {
-        this.start("r4");
+        this.start("r0");
       });
     },
   },
@@ -321,46 +334,71 @@ export default {
 </script>
 
 <style lang="scss">
-.matriz {
-  padding: 5px;
+.home {
+  width: 100%;
 }
+
 .options {
   margin: 20px 0 0 0;
+  padding: 0 2rem 0 2rem;
 }
 .form-group > label {
   font-size: 20px;
 }
+.btn-start {
+  padding: 0.4rem 3rem 0.4rem 3rem !important;
+}
+.col {
+  margin: 0 0 1rem 0;
+}
+.row {
+  margin: 0 1rem 0 1rem;
+}
+.square {
+  width: 4vw;
+  height: 4vw;
+}
 
 .hall {
-  background-color: rgb(155, 155, 155);
+  background-color: rgb(75, 75, 75);
 }
 .shelf {
-  background-color: rgb(187, 187, 187);
+  background-image: url("../assets/shelf.png");
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 .delivery {
-  background-color: red;
+  background-color: #28a745;
 }
 .dead-zone {
-  background-color: black;
+  background-color: #4b4b4b;
 }
 
 // Robot
 .robot {
-  background-color: blueviolet;
-  border-radius: 25px;
+  background-image: url("../assets/robot.png");
+  background-repeat: no-repeat;
+  background-size: contain;
   color: white;
-  transition: all 0.5s ease-in-out;
+  width: 3.5vw;
+  height: 3.5vw;
 }
 .garage {
-  background-color: darkgreen;
+  background-color: #4b4b4b;
 }
-
+.container-stock {
+  width: 60vw;
+  height: 50vw;
+  background-color: #4b4b4b;
+  border-radius: 25px;
+  padding: 1rem;
+}
 .stock {
-  background-color: rgb(155, 155, 155);
-  width: 750px;
-  height: 650px;
+  width: 60vw;
+  height: 50vw;
   display: flex;
   flex-wrap: wrap;
+  margin: 3rem 0 0 0;
 }
 .route {
   background-color: coral;
@@ -368,5 +406,34 @@ export default {
 
 .selected {
   background-color: orange !important;
+}
+
+@media only screen and (max-width: 900px) {
+  .square {
+    width: 6vw;
+    height: 6vw;
+  }
+  .stock {
+    width: 90vw;
+    height: 60vw;
+  }
+  .robot {
+    width: 5.5vw;
+    height: 5.5vw;
+  }
+}
+@media only screen and (min-width: 1350px) {
+  .square {
+    width: 3vw;
+    height: 3vw;
+  }
+  .stock {
+    width: 45vw;
+    height: 33vw;
+  }
+  .robot {
+    width: 2.5vw;
+    height: 2.5vw;
+  }
 }
 </style>

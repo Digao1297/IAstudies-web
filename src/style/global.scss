@@ -1,3 +1,8 @@
+* {
+  font-family: NotoSansHK, medium-content-sans-serif-font, "Lucida Grande",
+    "Lucida Sans Unicode", "Lucida Sans", Geneva, Arial, sans-serif;
+}
+
 body,
 html {
   height: 100%;
@@ -12,4 +17,13 @@ html {
 .center-x {
   display: flex !important;
   justify-content: center !important;
+}
+
+a {
+  text-decoration-line: none;
+}
+a:hover {
+  text-decoration-line: none;
+
+  opacity: 0.7;
 }
