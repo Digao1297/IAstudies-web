@@ -4,12 +4,21 @@
       <div class="col col-sm-5 col-md-5 col-lg-4 col-xl-4 ">
         <div class="options">
           <div class="form-group ">
-            <label for="inputOption"
-              ><span style="font-size:30px;">&#128187;</span> Algorithms</label
+            <label for="inputOption">
+              <h3><span style="font-size:30px;">&#128187;</span> Algorithms</h3>
+            </label>
+
+            <select
+              id="inputOption"
+              class="form-control btn-group"
+              v-model="selected"
             >
-            <select id="inputOption" class="form-control">
-              <option>Greedy Search</option>
-              <option>Search A&#9733;</option>
+              <option
+                v-for="(algorithm, item) in algorithms"
+                :key="item"
+                :value="{ id: algorithm.id, text: algorithm.name }"
+                >{{ algorithm.name }}</option
+              >
             </select>
           </div>
         </div>
@@ -36,6 +45,11 @@ export default {
   name: "Home",
   components: {},
   data: () => ({
+    algorithms: [
+      { id: 0, name: "Greedy Search" },
+      { id: 1, name: "Search A Star" }
+    ],
+    selected: "",
     pos: { x: 0, y: 0 },
     robots: {},
     inMove: false,
@@ -92,7 +106,7 @@ export default {
       "11:9",
       "11:10",
       "10:10",
-      "10:9",
+      "10:9"
     ],
     // result: ["1:14", "1:13", "2:13", "2:14"],
     matrix: [
@@ -108,14 +122,14 @@ export default {
       [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
       [0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0],
       [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4],
-      [3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+      [3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
     ],
     positionStop: {
       "11:1": true,
       "11:4": true,
       "11:7": true,
       "11:10": true,
-      "11:13": true,
+      "11:13": true
     },
     shelfSide: {
       "0": true,
@@ -127,17 +141,17 @@ export default {
       "5": false,
       "8": false,
       "11": false,
-      "14": false,
-    },
+      "14": false
+    }
   }),
   computed: {
     ...mapGetters({
-      getResult: "getResult",
-    }),
+      getResult: "getResult"
+    })
   },
   methods: {
     ...mapActions({
-      actionSendRequest: "actionSendRequest",
+      actionSendRequest: "actionSendRequest"
     }),
 
     createStock() {
@@ -225,7 +239,7 @@ export default {
       this.pos.y = y;
     },
     sleep(ms) {
-      return new Promise((resolve) => setTimeout(resolve, ms));
+      return new Promise(resolve => setTimeout(resolve, ms));
     },
     /**
      * metodo responsavel por mover o robo seguindo o vetor com a rota.
@@ -310,26 +324,34 @@ export default {
     },
 
     callApi() {
-      // http://localhost:8000/api/v1/algorithms/a_star
-
-      // http://localhost:8000/api/v1/algorithms/greedy_search
+      let a_star = "http://localhost:8000/api/v1/algorithms/a_star";
+      let greedy_search =
+        "http://localhost:8000/api/v1/algorithms/greedy_search";
 
       let request = {
         destiny: this.pos,
-        robots: this.robots,
+        robots: this.robots
       };
 
-      this.actionSendRequest({
-        url: "http://localhost:8000/api/v1/algorithms/a_star",
-        request,
-      }).then(() => {
-        this.start("r0");
-      });
-    },
+      if (this.selected.id == 0)
+        this.actionSendRequest({
+          url: greedy_search,
+          request
+        }).then(() => {
+          this.start("r0");
+        });
+      else if (this.selected.id == 1)
+        this.actionSendRequest({
+          url: a_star,
+          request
+        }).then(() => {
+          this.start("r0");
+        });
+    }
   },
   mounted() {
     this.createStock();
-  },
+  }
 };
 </script>
 
@@ -342,6 +364,7 @@ export default {
   margin: 20px 0 0 0;
   padding: 0 2rem 0 2rem;
 }
+
 .form-group > label {
   font-size: 20px;
 }
