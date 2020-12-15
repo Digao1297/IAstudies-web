@@ -205,8 +205,10 @@ export default {
           this.robots[name] = { x, y };
         } else if (type[i] == "shelf") {
           field.addEventListener("click", () => {
-            this.setPosition(x, y);
-            this.selectShelf(x, y);
+            if (field.childNodes.length == 0) {
+              this.setPosition(x, y);
+              this.selectShelf(x, y);
+            }
           });
           field.style = "cursor:pointer;";
           field.classList.add(type[i]);
