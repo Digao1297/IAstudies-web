@@ -81,18 +81,18 @@ export default {
     //   "5:4",
     //   "5:3",
     // ],
-    result: [
-      "12:4",
-      "11:4",
-      "11:3",
-      "11:2",
-      "11:1",
-      "10:1",
-      "9:1",
-      "8:1",
-      "7:1",
-      "7:2",
-    ],
+    // result: [
+    //   "12:4",
+    //   "11:4",
+    //   "11:3",
+    //   "11:2",
+    //   "11:1",
+    //   "10:1",
+    //   "9:1",
+    //   "8:1",
+    //   "7:1",
+    //   "7:2",
+    // ],
 
     // result: [
     //   "12:0",
@@ -149,6 +149,7 @@ export default {
   computed: {
     ...mapGetters({
       getResult: "getResult",
+      getRobot: "getRobot",
     }),
   },
   methods: {
@@ -264,9 +265,9 @@ export default {
      */
     async moveRobot(robot) {
       this.inMove = !this.inMove;
-      for (let i = 0; i < this.result.length; i++) {
-        this.setElement(robot, this.result[i]);
-        // console.log(`move ${this.result[i]}`);
+      for (let i = 0; i < this.getResult.length; i++) {
+        this.setElement(robot, this.getResult[i]);
+        // console.log(`move ${this.getResult[i]}`);
         await this.sleep(this.speed);
       }
       await this.sleep(1000);
@@ -289,7 +290,7 @@ export default {
        * a cada alteração da posição do robo é adicionado na @goBack para gerar a rota de volta.
        */
 
-      colRobot = this.result[this.result.length - 1].split(":");
+      colRobot = this.getResult[this.getResult.length - 1].split(":");
       if (this.shelfSide[colRobot[1]]) {
         side = parseInt(colRobot[1]) + 1;
       } else {
@@ -342,28 +343,23 @@ export default {
     },
 
     callApi() {
-      let a_star = "http://localhost:8000/api/v1/algorithms/a_star";
+      let a_star = "https://iaapi.herokuapp.com/api/v1/algorithms/a_star";
       let greedy_search =
-        "http://localhost:8000/api/v1/algorithms/greedy_search";
-
-      let request = {
-        destiny: this.pos,
-        robots: this.robots,
-      };
+        "https://iaapi.herokuapp.com/api/v1/algorithms/greedy_search";
 
       if (this.selected.id == 0)
         this.actionSendRequest({
           url: greedy_search,
-          request,
+          package: [this.pos.x, this.pos.y],
         }).then(() => {
-          this.start("r0");
+          this.start(this.getRobot);
         });
       else if (this.selected.id == 1)
         this.actionSendRequest({
           url: a_star,
-          request,
+          package: [this.pos.x, this.pos.y],
         }).then(() => {
-          this.start("r0");
+          this.start(this.getRobot);
         });
     },
   },
