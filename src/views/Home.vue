@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    {{ pos }}
     <div class="row center-x-y">
       <div class="col col-sm-5 col-md-5 col-lg-4 col-xl-4 ">
         <div class="options">
@@ -53,7 +52,13 @@ export default {
     ],
     selected: "",
     pos: { x: 0, y: 0 },
-    robots: {},
+    robots: {
+      'r0': [12, 0],
+      'r1': [12, 1],
+      'r2': [12, 2],
+      'r3': [12, 3],
+      'r4': [12, 4],
+    },
     inMove: false,
     speed: 350,
     /**
@@ -203,7 +208,7 @@ export default {
 
           field.appendChild(robot);
 
-          this.robots[name] = { x, y };
+          this.robots[name] = [x, y];
         } else if (type[i] == "shelf") {
           field.addEventListener("click", () => {
             if (field.childNodes.length == 0) {
@@ -227,16 +232,18 @@ export default {
 
     async start(r) {
       const robot = document.getElementById(r);
+      console.log(r, robot);
 
-      if (this.robots[r] == `${this.pos.x}:${this.pos.y}`) {
+      if (this.robots[r] == [this.pos.x, this.pos.y]) {
         await this.deliveryPackge(robot);
-      } else if (this.robots[r] != `${this.pos.x}:${this.pos.y}`) {
+      } else if (this.robots[r] != [this.pos.x, this.pos.y]) {
         await this.moveRobot(robot);
       }
     },
 
     setElement(robot, position) {
       let el = document.getElementById(`${position}`);
+      console.log(position, robot);
       el.appendChild(robot);
     },
 
@@ -267,7 +274,7 @@ export default {
       this.inMove = !this.inMove;
       for (let i = 0; i < this.getResult.length; i++) {
         this.setElement(robot, this.getResult[i]);
-        // console.log(`move ${this.getResult[i]}`);
+        console.log(`move ${this.getResult[i]}`);
         await this.sleep(this.speed);
       }
       await this.sleep(1000);
@@ -291,6 +298,7 @@ export default {
        */
 
       colRobot = this.getResult[this.getResult.length - 1].split(":");
+
       if (this.shelfSide[colRobot[1]]) {
         side = parseInt(colRobot[1]) + 1;
       } else {
@@ -338,14 +346,14 @@ export default {
       }
       nameRobot = robot.getAttribute("id");
       positionRobot = goBack[0].split(":");
-      this.robots[nameRobot] = { x: positionRobot[0], y: positionRobot[1] };
+      this.robots[nameRobot] = [ positionRobot[0], positionRobot[1] ];
       this.inMove = !this.inMove;
     },
 
     callApi() {
-      let a_star = "https://iaapi.herokuapp.com/api/v1/algorithms/a_star";
+      let a_star = "http://localhost:8000/api/v1/algorithms/a_star";
       let greedy_search =
-        "https://iaapi.herokuapp.com/api/v1/algorithms/greedy_search";
+        "http://localhost:8000/api/v1/algorithms/greedy_search";
 
       if (this.selected.id == 0)
         this.actionSendRequest({
@@ -358,7 +366,8 @@ export default {
         this.actionSendRequest({
           url: a_star,
           package: [this.pos.x, this.pos.y],
-        }).then(() => {
+        }).then(async () => {
+          await this.sleep(4000);
           this.start(this.getRobot);
         });
     },

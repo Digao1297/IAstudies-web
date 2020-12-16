@@ -11,8 +11,9 @@ export const actionSetRobot = async ({ commit }, payload) =>
 export const actionSendRequest = async ({ dispatch }, payload) => {
   console.log(payload);
   axios
-    .post(payload.url, { data: payload.package })
+    .post(payload.url,  { package: payload.package } )
     .then((response) => {
+      console.log(response.data)
       dispatch("actionSetResult", response.data.result);
       dispatch("actionSetRobot", response.data.robot);
     })
